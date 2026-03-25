@@ -12,7 +12,7 @@ export const useSSEStore = defineStore('sse', () => {
     // Evita abrir conexão duplicada
     if (eventSource) return
 
-    const baseURL = import.meta.env.VITE_API_URL || ''
+    const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
     eventSource = new EventSource(`${baseURL}/events?token=${token}`)
 
     eventSource.onopen = () => {

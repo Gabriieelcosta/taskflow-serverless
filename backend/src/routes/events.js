@@ -1,9 +1,21 @@
 const sseService = require('../services/sseService')
-const { authenticate } = require('../middlewares/auth')
+const { UnauthorizedError } = require('../utils/errors')
 
 async function eventRoutes(fastify) {
+  // EventSource do browser não suporta headers customizados,
+  // então o token vem na query string ao invés do header Authorization
+  async function authenticateSSE(request) {
+    try {
+      const token = request.query.token
+      if (!token) throw new Error('Token ausente')
+      request.user = fastify.jwt.verify(token)
+    } catch {
+      throw new UnauthorizedError('Token inválido ou expirado')
+    }
+  }
+
   fastify.get('/events', {
-    preHandler: authenticate,
+    preHandler: authenticateSSE,
     schema: {
       tags: ['Events'],
       summary: 'Conectar ao stream de eventos em tempo real (SSE)',
@@ -14,11 +26,13 @@ async function eventRoutes(fastify) {
     const userId = request.user.id
 
     // Define os headers necessários para SSE
+    // CORS precisa ser adicionado manualmente pois reply.raw.writeHead bypassa o middleware
     reply.raw.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
       'X-Accel-Buffering': 'no',
+      'Access-Control-Allow-Origin': '*',
     })
 
     // Registra o cliente como conectado
