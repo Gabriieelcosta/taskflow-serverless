@@ -21,7 +21,12 @@ async function getById(userId, taskId) {
 }
 
 async function create(userId, data) {
-  const task = await taskRepository.create({ ...data, ownerId: userId })
+  const cleanData = {
+    ...data,
+    description: data.description || null,
+    dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
+  }
+  const task = await taskRepository.create({ ...cleanData, ownerId: userId })
 
   // Transmite evento SSE para todos os usuários conectados
   sseService.broadcast('task:created', task, userId)
@@ -34,7 +39,11 @@ async function update(userId, taskId, data) {
   if (!task) throw new NotFoundError('Tarefa não encontrada')
   if (task.ownerId !== userId) throw new ForbiddenError('Apenas o dono pode editar a tarefa')
 
-  const updated = await taskRepository.update(taskId, data)
+  const cleanData = {
+    ...data,
+    dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
+  }
+  const updated = await taskRepository.update(taskId, cleanData)
 
   // Transmite evento SSE para colaboradores e responsável
   sseService.broadcast('task:updated', updated, userId)

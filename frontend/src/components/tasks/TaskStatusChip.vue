@@ -13,12 +13,11 @@ const props = defineProps({
 })
 
 const statusMap = {
-  TODO:        { label: 'Pendente',      color: 'default', icon: 'mdi-clock-outline' },
-  IN_PROGRESS: { label: 'Em andamento',  color: 'info',    icon: 'mdi-play-circle-outline' },
-  IN_REVIEW:   { label: 'Em revisão',    color: 'warning', icon: 'mdi-eye-outline' },
-  DONE:        { label: 'Concluída',     color: 'success', icon: 'mdi-check-circle-outline' },
-  CANCELLED:   { label: 'Cancelada',     color: 'error',   icon: 'mdi-close-circle-outline' },
+  PENDING:     { label: 'Pendente',     color: 'default', icon: 'mdi-clock-outline' },
+  IN_PROGRESS: { label: 'Em andamento', color: 'info',    icon: 'mdi-play-circle-outline' },
+  DONE:        { label: 'Concluída',    color: 'success', icon: 'mdi-check-circle-outline' },
+  CANCELLED:   { label: 'Cancelada',   color: 'error',   icon: 'mdi-close-circle-outline' },
 }
 
-const config = computed(() => statusMap[props.status] || statusMap.TODO)
+const config = computed(() => statusMap[props.status] || statusMap.PENDING)
 </script>

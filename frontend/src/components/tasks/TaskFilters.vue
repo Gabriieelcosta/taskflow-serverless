@@ -77,18 +77,16 @@ const localFilters = ref({
 })
 
 const statusOptions = [
-  { label: 'Pendente',     value: 'TODO' },
+  { label: 'Pendente',     value: 'PENDING' },
   { label: 'Em andamento', value: 'IN_PROGRESS' },
-  { label: 'Em revisão',   value: 'IN_REVIEW' },
   { label: 'Concluída',    value: 'DONE' },
   { label: 'Cancelada',    value: 'CANCELLED' },
 ]
 
 const priorityOptions = [
-  { label: 'Baixa',   value: 'LOW' },
-  { label: 'Média',   value: 'MEDIUM' },
-  { label: 'Alta',    value: 'HIGH' },
-  { label: 'Urgente', value: 'URGENT' },
+  { label: 'Baixa',  value: 'LOW' },
+  { label: 'Média',  value: 'MEDIUM' },
+  { label: 'Alta',   value: 'HIGH' },
 ]
 
 function emitFilters() {
