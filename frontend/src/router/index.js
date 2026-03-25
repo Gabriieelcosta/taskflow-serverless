@@ -1,79 +1,71 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import AuthLayout from '@/layouts/AuthLayout.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', redirect: '/dashboard' },
+    { path: '/', redirect: '/login' },
 
-    // Rotas públicas — com AuthLayout (tela centralizada)
+    // Rotas públicas — usam AuthLayout
     {
-      component: AuthLayout,
-      children: [
-        {
-          path: '/login',
-          name: 'Login',
-          component: () => import('@/pages/LoginPage.vue'),
-          meta: { public: true },
-        },
-        {
-          path: '/register',
-          name: 'Register',
-          component: () => import('@/pages/RegisterPage.vue'),
-          meta: { public: true },
-        },
-      ],
+      path: '/login',
+      name: 'Login',
+      component: () => import('@/pages/LoginPage.vue'),
+      meta: { layout: 'auth', public: true },
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: () => import('@/pages/RegisterPage.vue'),
+      meta: { layout: 'auth', public: true },
     },
 
-    // Rotas protegidas — com DefaultLayout (sidebar + header)
+    // Rotas protegidas — usam DefaultLayout
     {
-      component: DefaultLayout,
+      path: '/dashboard',
+      name: 'Dashboard',
+      component: () => import('@/pages/DashboardPage.vue'),
       meta: { requiresAuth: true },
-      children: [
-        {
-          path: '/dashboard',
-          name: 'Dashboard',
-          component: () => import('@/pages/DashboardPage.vue'),
-        },
-        {
-          path: '/tasks',
-          name: 'Tasks',
-          component: () => import('@/pages/TasksPage.vue'),
-        },
-        {
-          path: '/tasks/:id',
-          name: 'TaskDetail',
-          component: () => import('@/pages/TaskDetailPage.vue'),
-        },
-        {
-          path: '/categories',
-          name: 'Categories',
-          component: () => import('@/pages/CategoriesPage.vue'),
-        },
-        {
-          path: '/reports',
-          name: 'Reports',
-          component: () => import('@/pages/ReportsPage.vue'),
-        },
-      ],
+    },
+    {
+      path: '/tasks',
+      name: 'Tasks',
+      component: () => import('@/pages/TasksPage.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/tasks/:id',
+      name: 'TaskDetail',
+      component: () => import('@/pages/TaskDetailPage.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/categories',
+      name: 'Categories',
+      component: () => import('@/pages/CategoriesPage.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/reports',
+      name: 'Reports',
+      component: () => import('@/pages/ReportsPage.vue'),
+      meta: { requiresAuth: true },
     },
 
-    { path: '/:pathMatch(.*)*', redirect: '/dashboard' },
+    { path: '/:pathMatch(.*)*', redirect: '/login' },
   ],
 })
 
 // NAVIGATION GUARD
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   const token = localStorage.getItem('token')
   const isAuthenticated = !!token
 
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next({ name: 'Login' })
-  } else if (to.meta.public && isAuthenticated) {
-    next({ name: 'Dashboard' })
-  } else {
-    next()
+    return { name: 'Login' }
+  }
+
+  if (to.meta.public && isAuthenticated) {
+    return { name: 'Dashboard' }
   }
 })
 

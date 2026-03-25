@@ -84,7 +84,7 @@
     <!-- CONTEÚDO -->
     <v-main>
       <v-container fluid class="pa-6">
-        <RouterView />
+        <slot />
       </v-container>
     </v-main>
 

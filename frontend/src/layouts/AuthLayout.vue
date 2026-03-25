@@ -17,7 +17,7 @@
             </div>
 
             <!-- Conteúdo da página (Login ou Register) -->
-            <RouterView />
+            <slot />
 
           </v-col>
         </v-row>
