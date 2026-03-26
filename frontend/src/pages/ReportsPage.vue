@@ -42,8 +42,11 @@
               :title="statusLabel(item.status)"
               :subtitle="`${item.count} tarefa(s)`"
             >
+              <template #prepend>
+                <v-icon :color="statusColor(item.status)" size="10">mdi-circle</v-icon>
+              </template>
               <template #append>
-                <v-chip size="small" variant="tonal">{{ item.count }}</v-chip>
+                <v-chip size="small" variant="tonal" :color="statusColor(item.status)">{{ item.count }}</v-chip>
               </template>
             </v-list-item>
           </v-list>
@@ -62,8 +65,11 @@
               :title="priorityLabel(item.priority)"
               :subtitle="`${item.count} tarefa(s)`"
             >
+              <template #prepend>
+                <v-icon :color="priorityColor(item.priority)" size="10">mdi-circle</v-icon>
+              </template>
               <template #append>
-                <v-chip size="small" variant="tonal">{{ item.count }}</v-chip>
+                <v-chip size="small" variant="tonal" :color="priorityColor(item.priority)">{{ item.count }}</v-chip>
               </template>
             </v-list-item>
           </v-list>
@@ -93,9 +99,17 @@ const statusLabels = {
 const priorityLabels = {
   LOW: 'Baixa', MEDIUM: 'Média', HIGH: 'Alta', URGENT: 'Urgente',
 }
+const statusColors = {
+  PENDING: 'warning', IN_PROGRESS: 'info', DONE: 'success', CANCELLED: 'default',
+}
+const priorityColors = {
+  LOW: 'success', MEDIUM: 'warning', HIGH: 'error', URGENT: 'deep-orange',
+}
 
 function statusLabel(s) { return statusLabels[s] || s }
 function priorityLabel(p) { return priorityLabels[p] || p }
+function statusColor(s) { return statusColors[s] || 'default' }
+function priorityColor(p) { return priorityColors[p] || 'default' }
 
 onMounted(async () => {
   loading.value = true
