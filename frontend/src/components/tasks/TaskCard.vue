@@ -1,7 +1,8 @@
 <template>
   <v-card
-    class="task-card"
+    class="task-card d-flex flex-column"
     :class="{ 'task-card--overdue': isOverdue }"
+    height="100%"
     @click="emit('click', task)"
   >
     <v-card-item>
