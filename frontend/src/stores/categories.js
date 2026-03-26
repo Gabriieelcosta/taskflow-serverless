@@ -35,6 +35,18 @@ export const useCategoryStore = defineStore('categories', () => {
     categories.value = categories.value.filter((c) => c.id !== id)
   }
 
+  function applySSEUpdate(event) {
+    if (event.type === 'category:created') {
+      const exists = categories.value.find((c) => c.id === event.category.id)
+      if (!exists) categories.value.push(event.category)
+    } else if (event.type === 'category:updated') {
+      const index = categories.value.findIndex((c) => c.id === event.category.id)
+      if (index !== -1) categories.value[index] = event.category
+    } else if (event.type === 'category:deleted') {
+      categories.value = categories.value.filter((c) => c.id !== event.categoryId)
+    }
+  }
+
   return {
     categories,
     loading,
@@ -42,5 +54,6 @@ export const useCategoryStore = defineStore('categories', () => {
     createCategory,
     updateCategory,
     deleteCategory,
+    applySSEUpdate,
   }
 })

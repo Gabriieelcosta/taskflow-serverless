@@ -1,4 +1,5 @@
 const categoryRepository = require('../repositories/categoryRepository')
+const sseService = require('./sseService')
 const { NotFoundError, ForbiddenError } = require('../utils/errors')
 
 async function getAll() {
@@ -6,7 +7,9 @@ async function getAll() {
 }
 
 async function create(userId, { name, color }) {
-  return categoryRepository.create({ name, color, userId })
+  const category = await categoryRepository.create({ name, color, userId })
+  sseService.broadcast('category:created', category, userId)
+  return category
 }
 
 async function update(userId, categoryId, data) {
@@ -14,7 +17,9 @@ async function update(userId, categoryId, data) {
   if (!category) throw new NotFoundError('Categoria não encontrada')
   if (category.userId !== userId) throw new ForbiddenError('Acesso negado')
 
-  return categoryRepository.update(categoryId, data)
+  const updated = await categoryRepository.update(categoryId, data)
+  sseService.broadcast('category:updated', updated, userId)
+  return updated
 }
 
 async function remove(userId, categoryId) {
@@ -22,7 +27,8 @@ async function remove(userId, categoryId) {
   if (!category) throw new NotFoundError('Categoria não encontrada')
   if (category.userId !== userId) throw new ForbiddenError('Acesso negado')
 
-  return categoryRepository.remove(categoryId)
+  await categoryRepository.remove(categoryId)
+  sseService.broadcast('category:deleted', { id: categoryId }, userId)
 }
 
 module.exports = { getAll, create, update, remove }

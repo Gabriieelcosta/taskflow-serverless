@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useTaskStore } from './tasks'
+import { useCategoryStore } from './categories'
 
 export const useSSEStore = defineStore('sse', () => {
   // ESTADO 
@@ -33,6 +34,21 @@ export const useSSEStore = defineStore('sse', () => {
     eventSource.addEventListener('task:deleted', (e) => {
       const taskStore = useTaskStore()
       taskStore.applySSEUpdate({ type: 'task:deleted', taskId: JSON.parse(e.data).id })
+    })
+
+    eventSource.addEventListener('category:created', (e) => {
+      const categoryStore = useCategoryStore()
+      categoryStore.applySSEUpdate({ type: 'category:created', category: JSON.parse(e.data) })
+    })
+
+    eventSource.addEventListener('category:updated', (e) => {
+      const categoryStore = useCategoryStore()
+      categoryStore.applySSEUpdate({ type: 'category:updated', category: JSON.parse(e.data) })
+    })
+
+    eventSource.addEventListener('category:deleted', (e) => {
+      const categoryStore = useCategoryStore()
+      categoryStore.applySSEUpdate({ type: 'category:deleted', categoryId: JSON.parse(e.data).id })
     })
 
     eventSource.onerror = () => {
