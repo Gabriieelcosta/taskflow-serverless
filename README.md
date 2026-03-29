@@ -142,6 +142,72 @@ npm run dev
 
 ---
 
+### ☁️ Arquitetura Serverless — AWS Lambda
+
+O backend foi projetado para rodar tanto via Docker quanto como funcao **AWS Lambda**, usando o pacote `serverless-http` que adapta o Fastify para o ambiente serverless.
+
+> Devido ao prazo de entrega do desafio, optei por entregar o ambiente completo funcionando via Docker. Porem a estrutura para deploy na AWS ja esta implementada e pronta para uso.
+
+**Como funciona:**
+
+```
+Requisicao HTTP
+      ↓
+AWS API Gateway   ← recebe a requisicao
+      ↓
+AWS Lambda        ← executa o handler.js (Fastify adaptado)
+      ↓
+Banco de dados    ← PostgreSQL (ex: AWS RDS)
+```
+
+O arquivo `handler.js` e o ponto de entrada para o Lambda:
+
+```js
+// handler.js
+const serverless = require('serverless-http')
+const { buildApp } = require('./server')
+
+module.exports.handler = async (event, context) => {
+  const app = await buildApp()
+  return serverless(app)(event, context)
+}
+```
+
+O `serverless.yml` define toda a infraestrutura na AWS:
+
+```yaml
+functions:
+  api:
+    handler: handler.main
+    events:
+      - httpApi:
+          path: /{proxy+}   # todas as rotas da API
+          method: ANY
+```
+
+**Pre-requisitos para deploy:**
+
+```bash
+npm install -g serverless
+aws configure   # configure suas credenciais AWS
+```
+
+**Comandos de deploy:**
+
+```bash
+cd backend
+
+# Testar localmente simulando o Lambda
+npx serverless offline
+
+# Deploy na AWS
+npx serverless deploy --stage prod
+```
+
+> O banco de dados em producao deve ser um PostgreSQL acessivel pela Lambda, como o **AWS RDS** ou **Supabase**. A variavel `DATABASE_URL` deve apontar para esse banco nas variaveis de ambiente da Lambda.
+
+---
+
 ## 🔑 Variaveis de Ambiente
 
 Arquivo: `backend/.env`
